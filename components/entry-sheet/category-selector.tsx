@@ -1,4 +1,4 @@
-import { FontSize, Spacing, useThemeColors } from "@/constants/theme";
+import { BorderRadius, FontSize, Spacing, useThemeColors } from "@/constants/theme";
 import { createGlassModifier } from "@/utils/ui-modifiers";
 import {
   Button,
@@ -11,11 +11,14 @@ import {
 } from "@expo/ui/swift-ui";
 import { clipShape, padding } from "@expo/ui/swift-ui/modifiers";
 import { router } from "expo-router";
-import React from "react";
 import { StyleSheet, useColorScheme, View } from "react-native";
 
+const CATEGORIES = ["drinks", "meals", "snacks"] as const;
+
+type Category = (typeof CATEGORIES)[number];
+
 interface CategorySelectorProps {
-  onCategorySelect?: (category: string) => void;
+  onCategorySelect?: (category: Category) => void;
 }
 
 export function CategorySelector({ onCategorySelect }: CategorySelectorProps) {
@@ -23,111 +26,58 @@ export function CategorySelector({ onCategorySelect }: CategorySelectorProps) {
   const theme = rawTheme === "dark" ? "dark" : "light";
   const themeColors = useThemeColors();
 
-  const handleOpenCategorySheet = (category: string) => {
-    if (onCategorySelect) {
-      onCategorySelect(category);
-    }
+  const handleOpenCategorySheet = (category: Category) => {
+    onCategorySelect?.(category);
     router.push({
       pathname: "/category",
       params: { category },
     });
   };
 
+  const CategoryButton = ({ category }: { category: Category }) => {
+    const label = category.charAt(0).toUpperCase() + category.slice(1);
+
+    return (
+      <Host matchContents>
+        <Button onPress={() => handleOpenCategorySheet(category)}>
+          <VStack modifiers={[clipShape("roundedRectangle", BorderRadius.lg)]}>
+            <HStack
+              modifiers={[
+                padding({ horizontal: Spacing.md, vertical: Spacing.lg }),
+                createGlassModifier(true, theme),
+              ]}
+            >
+              <UIText
+                color={themeColors.secondaryText}
+                weight="medium"
+                size={FontSize.normal}
+              >
+                {label}
+              </UIText>
+              <Spacer />
+              <Image
+                systemName="chevron.forward.circle.fill"
+                color={themeColors.secondaryText}
+                size={FontSize.medium}
+              />
+            </HStack>
+          </VStack>
+        </Button>
+      </Host>
+    );
+  };
+
   return (
-    <View style={styles.savedEntriesCategoriesContainer}>
-      <Host matchContents>
-        <Button onPress={() => handleOpenCategorySheet("drinks")}>
-          <VStack modifiers={[clipShape("roundedRectangle", 16)]}>
-            <HStack
-              modifiers={[
-                padding({
-                  horizontal: Spacing.md,
-                  vertical: Spacing.lg,
-                }),
-                createGlassModifier(true, theme),
-              ]}
-            >
-              <UIText
-                color={themeColors.secondaryText}
-                weight="medium"
-                size={FontSize.normal}
-              >
-                Drinks
-              </UIText>
-              <Spacer />
-              <Image
-                systemName="chevron.forward.circle.fill"
-                color={themeColors.secondaryText}
-                size={FontSize.medium}
-              />
-            </HStack>
-          </VStack>
-        </Button>
-      </Host>
-      <Host matchContents>
-        <Button onPress={() => handleOpenCategorySheet("meals")}>
-          <VStack modifiers={[clipShape("roundedRectangle", 16)]}>
-            <HStack
-              modifiers={[
-                padding({
-                  horizontal: Spacing.md,
-                  vertical: Spacing.lg,
-                }),
-                createGlassModifier(true, theme),
-              ]}
-            >
-              <UIText
-                color={themeColors.secondaryText}
-                weight="medium"
-                size={FontSize.normal}
-              >
-                Meals
-              </UIText>
-              <Spacer />
-              <Image
-                systemName="chevron.forward.circle.fill"
-                color={themeColors.secondaryText}
-                size={FontSize.medium}
-              />
-            </HStack>
-          </VStack>
-        </Button>
-      </Host>
-      <Host matchContents>
-        <Button onPress={() => handleOpenCategorySheet("snacks")}>
-          <VStack modifiers={[clipShape("roundedRectangle", 16)]}>
-            <HStack
-              modifiers={[
-                padding({
-                  horizontal: Spacing.md,
-                  vertical: Spacing.lg,
-                }),
-                createGlassModifier(true, theme),
-              ]}
-            >
-              <UIText
-                color={themeColors.secondaryText}
-                weight="medium"
-                size={FontSize.normal}
-              >
-                Snacks
-              </UIText>
-              <Spacer />
-              <Image
-                systemName="chevron.forward.circle.fill"
-                color={themeColors.secondaryText}
-                size={FontSize.medium}
-              />
-            </HStack>
-          </VStack>
-        </Button>
-      </Host>
+    <View style={styles.container}>
+      {CATEGORIES.map((category) => (
+        <CategoryButton key={category} category={category} />
+      ))}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  savedEntriesCategoriesContainer: {
+  container: {
     flex: 1,
     flexDirection: "column",
     gap: Spacing.md,

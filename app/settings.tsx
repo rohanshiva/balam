@@ -496,10 +496,6 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     alignItems: "center",
   },
-  infoTitleText: {
-    fontSize: FontSize.large,
-    fontWeight: "bold",
-  },
   infoText: {
     fontSize: FontSize.normal,
     fontWeight: "regular",
@@ -542,18 +538,6 @@ const styles = StyleSheet.create({
   },
   reviewText: {
     fontSize: FontSize.medium,
-  },
-  emailText: {
-    fontSize: FontSize.medium,
-    fontWeight: "semibold",
-  },
-  emailContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.lg,
   },
   footerContainer: {
     alignItems: "center",

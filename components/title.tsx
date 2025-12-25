@@ -1,3 +1,4 @@
+import Text from "@/components/Text";
 import { Colors, FontSize, Spacing, useThemeColors } from "@/constants/theme";
 import { useTodayEntries } from "@/stores/logged-entries";
 import { useProfile } from "@/stores/profile";
@@ -5,12 +6,11 @@ import { formatNumber } from "@/utils";
 import { Host, LinearProgress } from "@expo/ui/swift-ui";
 import { format } from "date-fns";
 import { StyleSheet, View } from "react-native";
-import Text from "@/components/Text";
 
 export default function Title() {
   const themeColors = useThemeColors();
   const { totalProtein: protein } = useTodayEntries();
-  const { proteinGoal } = useProfile();
+  const { proteinGoal = 1 } = useProfile();
   const remainingProtein = proteinGoal - protein;
   const progress = Math.max(0, Math.min(1, protein / proteinGoal));
 

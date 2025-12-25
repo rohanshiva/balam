@@ -1,6 +1,5 @@
 import { StreakGrid } from "@/components/streak-grid";
 import {
-  BorderRadius,
   Colors,
   FontSize,
   Spacing,
@@ -22,7 +21,7 @@ import {
   useAuthRequest,
   useAutoDiscovery,
 } from "expo-auth-session";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -254,41 +253,5 @@ const styles = StyleSheet.create({
   gridContainer: {
     width: "100%",
     transform: [{ rotate: "-2deg" }],
-  },
-  metricsColumn: {
-    flexDirection: "column",
-    gap: Spacing.md,
-    alignItems: "flex-start",
-  },
-  metricsRow: {
-    flexDirection: "row",
-    width: "100%",
-  },
-  metricContainer: {
-    flex: 1,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: Spacing.md,
-  },
-  metricIconContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    padding: Spacing.md,
-    width: 48,
-    height: 48,
-    borderRadius: BorderRadius.md,
-  },
-  metricContent: {
-    flexDirection: "column",
-    gap: Spacing.xxs,
-    alignItems: "flex-start",
-  },
-  metricTitle: {
-    fontSize: FontSize.medium,
-    fontWeight: "bold",
-  },
-  metricValue: {
-    fontSize: FontSize.large,
-    fontWeight: "bold",
   },
 });

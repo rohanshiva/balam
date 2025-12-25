@@ -19,4 +19,4 @@ export {
 } from "./logged-entries";
 export type { CreateLoggedEntry, LoggedEntry } from "./logged-entries";
 
-export { updateProteinGoal, useProfile } from "./profile";
+export { updateNickname, updateProteinGoal, useProfile } from "./profile";

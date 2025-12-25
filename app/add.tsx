@@ -24,7 +24,7 @@ import {
   fixedSize
 } from "@expo/ui/swift-ui/modifiers";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
@@ -401,10 +401,6 @@ const styles = StyleSheet.create({
   nameContainer: {
     alignItems: "center",
     alignSelf: "center",
-  },
-  nameText: {
-    fontWeight: "medium",
-    fontSize: FontSize.small,
   },
   logButtonContainer: {
     flex: 1,

@@ -1,11 +1,10 @@
-import db from "@/db";
+import db, { id } from "@/db";
 import {
   getTodayRange,
   getWeekStartTimestamp,
   sumProtein,
   type LoggedEntry,
 } from "@/utils/metrics";
-import { id } from "@instantdb/react-native";
 
 export type { LoggedEntry };
 
@@ -99,7 +98,7 @@ export const useWeeklyEntries = () => {
 export const addLoggedEntry = async (
   entry: CreateLoggedEntry,
   profileId: string
-) => {
+): Promise<string> => {
   const entryId = id();
   await db.transact([
     db.tx.loggedEntries[entryId]
@@ -111,6 +110,7 @@ export const addLoggedEntry = async (
       })
       .link({ profile: profileId }),
   ]);
+  return entryId;
 };
 
 export const updateLoggedEntry = async (

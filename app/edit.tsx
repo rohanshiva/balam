@@ -4,16 +4,16 @@ import {
   NumpadWithAnimations,
 } from "@/components/entry-sheet/numpad";
 import { PhotoPicker } from "@/components/entry-sheet/photo-picker";
+import Text from "@/components/Text";
 import { BorderRadius, Colors, FontSize, Spacing, useThemeColors } from "@/constants/theme";
 import { useCurrentEntryStore } from "@/stores";
 import { removeLoggedEntry, updateLoggedEntry, useLoggedEntries } from "@/stores/logged-entries";
 import { Button, Host, HStack, Image, Text as UIText } from "@expo/ui/swift-ui";
 import { clipShape, fixedSize, glassEffect, padding } from "@expo/ui/swift-ui/modifiers";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import Text from "@/components/Text";
 
 const TimePickerButton = () => {
   const themeColors = useThemeColors();
@@ -442,10 +442,6 @@ const styles = StyleSheet.create({
   deleteButtonContainer: {
     alignItems: "center",
     alignSelf: "center",
-  },
-  nameText: {
-    fontWeight: "medium",
-    fontSize: FontSize.small,
   },
   actionButtonsContainer: {
     flexDirection: "column",

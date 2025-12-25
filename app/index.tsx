@@ -9,7 +9,6 @@ import { useLoggedEntries } from "@/stores/logged-entries";
 import { useProfile } from "@/stores/profile";
 import { Button, Host, HStack, Spacer } from "@expo/ui/swift-ui";
 import { Redirect, useRouter } from "expo-router";
-import React from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -74,7 +73,7 @@ export default function HomeScreen() {
       >
         <BG />
         <View style={{ gap: Spacing.xl }}>
-          <StreakGrid entries={entries} proteinGoal={proteinGoal!} />
+          <StreakGrid entries={entries} proteinGoal={proteinGoal ?? 150} />
           <Entries />
           <Metrics />
           <Friends />

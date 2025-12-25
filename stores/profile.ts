@@ -28,11 +28,11 @@ export const useProfile = () => {
 export const createProfile = async (
   userId: string,
   data: { nickname: string; proteinGoal?: number }
-) => {
+): Promise<string> => {
   const profileId = id();
   await db.transact([
     db.tx.profiles[profileId]
-      .update({
+      .create({
         nickname: data.nickname,
         proteinGoal: data.proteinGoal,
       })

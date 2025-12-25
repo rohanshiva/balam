@@ -3,6 +3,7 @@ import { Colors, FontSize, Spacing, useThemeColors } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
+  LayoutChangeEvent,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -241,8 +242,7 @@ export function NumpadWithAnimations({ value, setProtein }: NumpadWithAnimations
     setAnimations((prev) => prev.filter((anim) => anim.id !== id));
   };
 
-  const handleLayout = (event: any) => {
-    const { x, y } = event.nativeEvent.layout;
+  const handleLayout = (_event: LayoutChangeEvent) => {
     containerRef.current?.measureInWindow((pageX, pageY) => {
       setContainerLayout({ x: pageX, y: pageY });
     });

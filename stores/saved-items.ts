@@ -13,7 +13,7 @@ export interface CreateSavedItem {
 
 /**
  * Hook to get all saved items for the current user.
- * Use the returned `byCategory` helper for filtered access.
+ * For category-specific access, use `useSavedItemsByCategory` instead.
  */
 export const useSavedItems = () => {
   const { user } = db.useAuth();
@@ -30,16 +30,8 @@ export const useSavedItems = () => {
       : null
   );
 
-  const items = data?.savedItems || [];
-
-  // Client-side filter by category
-  const byCategory = useMemo(() => {
-    return (category: string) => items.filter((item) => item.category === category);
-  }, [items]);
-
   return {
-    items,
-    byCategory,
+    items: data?.savedItems ?? [],
     isLoading,
     error,
   };
@@ -47,7 +39,8 @@ export const useSavedItems = () => {
 
 /**
  * Hook to get saved items for a specific category.
- * Uses client-side filtering from the main query.
+ * Fetches all items and filters client-side for simplicity.
+ * InstantDB deduplicates subscriptions, so multiple calls are efficient.
  */
 export const useSavedItemsByCategory = (category: string) => {
   const { items, isLoading, error } = useSavedItems();
@@ -64,7 +57,10 @@ export const useSavedItemsByCategory = (category: string) => {
   };
 };
 
-export const addSavedItem = async (item: CreateSavedItem, profileId: string) => {
+export const addSavedItem = async (
+  item: CreateSavedItem,
+  profileId: string
+): Promise<string> => {
   const itemId = id();
   await db.transact([
     db.tx.savedItems[itemId]
@@ -75,6 +71,7 @@ export const addSavedItem = async (item: CreateSavedItem, profileId: string) => 
       })
       .link({ profile: profileId }),
   ]);
+  return itemId;
 };
 
 export const updateSavedItem = async (

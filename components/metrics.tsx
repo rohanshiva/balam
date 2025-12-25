@@ -1,3 +1,4 @@
+import Text from "@/components/Text";
 import {
   BorderRadius,
   FontSize,
@@ -14,7 +15,6 @@ import { Host, Image } from "@expo/ui/swift-ui";
 import { GlassView } from "expo-glass-effect";
 import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
-import Text from "@/components/Text";
 
 interface MetricProps {
   title: string;
@@ -69,44 +69,24 @@ export default function Metrics() {
     [entries]
   );
 
-  const getFormattedValue = (index: number) =>
-    METRIC_CONFIG[index].format(metrics[METRIC_CONFIG[index].key]);
-
-  const FirstRow = () => (
-    <View style={styles.metricsRow}>
-      <Metric
-        title={METRIC_CONFIG[0].label}
-        icon={METRIC_CONFIG[0].icon}
-        value={getFormattedValue(0)}
-      />
-      <Metric
-        title={METRIC_CONFIG[1].label}
-        icon={METRIC_CONFIG[1].icon}
-        value={getFormattedValue(1)}
-      />
-    </View>
-  );
-
-  const SecondRow = () => (
-    <View style={styles.metricsRow}>
-      <Metric
-        title={METRIC_CONFIG[2].label}
-        icon={METRIC_CONFIG[2].icon}
-        value={getFormattedValue(2)}
-      />
-      <Metric
-        title={METRIC_CONFIG[3].label}
-        icon={METRIC_CONFIG[3].icon}
-        value={getFormattedValue(3)}
-      />
-    </View>
-  );
+  // Split metrics into rows of 2
+  const rows = [METRIC_CONFIG.slice(0, 2), METRIC_CONFIG.slice(2, 4)];
 
   return (
     <View style={styles.container}>
       <View style={styles.metricsColumn}>
-        <FirstRow />
-        <SecondRow />
+        {rows.map((row, rowIndex) => (
+          <View key={rowIndex} style={styles.metricsRow}>
+            {row.map((config) => (
+              <Metric
+                key={config.key}
+                title={config.label}
+                icon={config.icon}
+                value={config.format(metrics[config.key])}
+              />
+            ))}
+          </View>
+        ))}
       </View>
     </View>
   );
