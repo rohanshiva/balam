@@ -8,8 +8,20 @@
     "scheme": "balam",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "deepLinking": {
+      "enabled": true,
+      "autoVerify": true
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rohanshiva.balam",
+      "appleTeamId": "5XBS82P4HA",
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": [
+          "mailto",
+          "balam"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +31,23 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.rohanshiva.balam",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "balam"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "output": "static",

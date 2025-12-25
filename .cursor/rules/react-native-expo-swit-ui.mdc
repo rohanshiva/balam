@@ -1,0 +1,314 @@
+---
+title: React Native + @expo/ui/swift-ui + TypeScript Cursor Rules
+alwaysApply: true
+---
+Act as a world-class senior frontend engineer with deep expertise in React Native
+and UI/UX design. Your primary goal is to generate complete and functional apps
+with excellent visual asthetics.
+
+
+- Always use functional React components with hooks; avoid class components.
+- Use TypeScript for all React Native and web components; define props with descriptive interfaces rather than using any.
+- Prefer small, focused components and compose screens from these subcomponents to keep render functions simple and readable.
+- Name event handlers with a handle prefix (for example handlePress, handleSubmit, handleChange) and pass them to onPress/onChange/onClick props.
+- Avoid unnecessary re‑renders by using React.memo for pure presentational components and useCallback/useMemo only when closures or expensive computations cause real performance issues. **Do not add memoization hooks by default.**
+- Use camelCase for variables and functions, PascalCase for React components and TypeScript interfaces, and keep names descriptive (for example isLoading, hasError, userProfileHeader).
+- For React Native styling, use StyleSheet.create and avoid inline styles; group related styles in the same file as the component or in a nearby styles file.
+- Keep React Native UI declarative and layout-driven; prefer flexbox layouts and extracted UI primitives over deeply nested JSX.
+- For @expo/ui/swift-ui componnets, keep view structs small and compose them with modifiers; use SwiftUI modifiers (.padding, .background, .cornerRadius, .frame, etc.) for styling instead of styling logic elsewhere.
+- Use @expo/ui/swift-ui modifiers in a consistent order (layout → visuals → accessibility) to keep view code easy to scan and maintain.
+
+## Component Organization
+
+**Define sub-components INSIDE the parent component when:**
+- They need access to parent scope (props, hooks, theme colors, computed values)
+- They're tightly coupled to the parent and unlikely to be reused elsewhere
+- You want to avoid prop drilling for context/theme/hooks
+
+**Define sub-components OUTSIDE the parent component when:**
+- They're truly independent and don't need parent scope
+- They're reusable across multiple parent components
+- They accept all needed data via props and don't rely on context/hooks
+- Keeping them inside would make the parent component too long or hard to read
+
+Example 1:
+
+```tsx
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { formatter } from '@/lib/formatter'; // assuming you have this
+import { readingTime } from 'reading-time-estimator';
+
+interface PostMetaProps {
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  content: string;
+}
+
+const PostMeta = ({ title, createdAt, updatedAt, content }: PostMetaProps) => {
+  const handlePressMeta = () => {
+    // could add tap to copy date or something
+    console.log('Meta pressed');
+  };
+
+  const Separator = () => (
+    <Text style={styles.separator}>⋅</Text>
+  );
+
+  const PublishedTime = () => (
+    <Text style={styles.metaText}>Published {formatter.date(new Date(createdAt))}</Text>
+  );
+
+  const UpdatedTime = () => (
+    <Text style={styles.metaText}>Updated {formatter.date(new Date(updatedAt))}</Text>
+  );
+
+  const ReadingTime = () => {
+    const minutes = readingTime(content).minutes;
+    return <Text style={styles.metaText}>{minutes} min read</Text>;
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title} onPress={handlePressMeta}>{title}</Text>
+      <View style={styles.metaRow}>
+        <PublishedTime />
+        <Separator />
+        <UpdatedTime />
+        <Separator />
+        <ReadingTime />
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 16,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 8,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  metaText: {
+    fontSize: 14,
+    color: '#666',
+  },
+  separator: {
+    fontSize: 14,
+    color: '#999',
+  },
+});
+
+export default PostMeta;
+```
+
+Example 2 (with theme colors and parent scope):
+
+```tsx
+import { Colors, FontSize, Spacing, useThemeColors } from '@/constants/theme';
+import { useTodayEntries } from '@/stores/logged-entries';
+import { useProfile } from '@/stores/profile';
+import { Host, LinearProgress } from '@expo/ui/swift-ui';
+import { format } from 'date-fns';
+import { StyleSheet, Text, View } from 'react-native';
+
+export default function Title() {
+  const themeColors = useThemeColors();
+  const { totalProtein: protein } = useTodayEntries();
+  const { proteinGoal } = useProfile();
+  const remainingProtein = parseFloat((proteinGoal - protein).toFixed(2));
+  const progress = Math.max(0, Math.min(1, protein / proteinGoal));
+
+  const DayLabel = () => (
+    <Text style={[styles.day, { color: themeColors.text }]}>
+      {format(new Date(), 'EE')}
+    </Text>
+  );
+
+  const DateLabel = () => (
+    <Text style={[styles.date, { color: themeColors.secondaryText }]}>
+      {format(new Date(), 'MMM do')}
+    </Text>
+  );
+
+  const CurrentProtein = () => (
+    <Text style={[styles.currentProtein, { color: themeColors.text }]}>
+      {`${Number.isInteger(protein) ? protein : protein.toFixed(2)} g`}
+    </Text>
+  );
+
+  const RemainingProtein = () => (
+    <Text style={[styles.remainingProtein, { color: themeColors.secondaryText }]}>
+      {remainingProtein > 0
+        ? `${Math.abs(remainingProtein)} g left`
+        : `${Math.abs(remainingProtein)} g over`}
+    </Text>
+  );
+
+  const ProgressBar = () => (
+    <Host matchContents>
+      <LinearProgress
+        progress={progress}
+        color={remainingProtein > 0 ? Colors.accent.orange : Colors.accent.green}
+      />
+    </Host>
+  );
+
+  return (
+    <View style={styles.container}>
+      <View>
+        <DayLabel />
+        <DateLabel />
+      </View>
+      <CurrentProtein />
+      <View style={styles.column}>
+        <RemainingProtein />
+        <ProgressBar />
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  column: {
+    flexDirection: 'column',
+    gap: Spacing.xs,
+  },
+  day: {
+    fontSize: FontSize.large,
+    fontWeight: 'bold',
+  },
+  date: {
+    fontSize: FontSize.medium,
+    fontWeight: 'semibold',
+  },
+  container: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  currentProtein: {
+    fontWeight: 'bold',
+    fontSize: FontSize.large,
+  },
+  remainingProtein: {
+    fontSize: FontSize.small,
+    fontWeight: 'bold',
+  },
+});
+```
+
+Example 3 (components defined outside - when they don't need parent scope):
+
+```tsx
+import { StyleSheet, Text, View } from 'react-native';
+
+interface AvatarProps {
+  initials: string;
+  size?: number;
+}
+
+const Avatar = ({ initials, size = 40 }: AvatarProps) => (
+  <View style={[styles.avatar, { width: size, height: size, borderRadius: size / 2 }]}>
+    <Text style={styles.initials}>{initials}</Text>
+  </View>
+);
+
+interface BadgeProps {
+  count: number;
+}
+
+const Badge = ({ count }: BadgeProps) => (
+  <View style={styles.badge}>
+    <Text style={styles.badgeText}>{count}</Text>
+  </View>
+);
+
+interface UserCardProps {
+  name: string;
+  email: string;
+  unreadCount: number;
+}
+
+export default function UserCard({ name, email, unreadCount }: UserCardProps) {
+  const initials = name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
+  return (
+    <View style={styles.container}>
+      <Avatar initials={initials} />
+      <View style={styles.info}>
+        <Text style={styles.name}>{name}</Text>
+        <Text style={styles.email}>{email}</Text>
+      </View>
+      {unreadCount > 0 && <Badge count={unreadCount} />}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    gap: 12,
+  },
+  avatar: {
+    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  initials: {
+    color: '#FFF',
+    fontWeight: 'bold',
+  },
+  info: {
+    flex: 1,
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  email: {
+    fontSize: 14,
+    color: '#666',
+  },
+  badge: {
+    backgroundColor: '#FF3B30',
+    borderRadius: 10,
+    minWidth: 20,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+});
+```
+
+This shows the exact pattern you like:
+- Tiny focused components (Separator, PublishedTime, DayLabel, Avatar, Badge, etc.)
+- **Inside** when they need parent scope (props, hooks, theme colors, computed values)
+- **Outside** when they're independent and reusable, accepting all data via props
+- Composed cleanly in the main component render
+- handlePressMeta for event naming
+- StyleSheet.create for all RN styling
+- TypeScript interfaces for all props
+- Clean, readable JSX with no nesting hell
